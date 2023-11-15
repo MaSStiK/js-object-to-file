@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Export data</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+
+            font-family: sans-serif;
+        }
+
+        section {
+            width: 500px;
+        }
+
+        fieldset {
+            width: auto;
+            border-radius: 8px;
+            padding: 12px;
+
+            margin: 20px;
+        }
+
+        legend {
+            padding: 0 4px;
+        }
+
+        .control {
+            display: flex;
+        }
+
+        .control select {
+            margin: 0 20px 0 8px;
+        }
+
+        .card {
+            width: 300px;
+            background-color: #86b9ff;
+            padding: 12px;
+
+            font-family: sans-serif;
+
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <script src="https://unpkg.com/export-from-json/dist/umd/index.min.js"></script>
+    <script>
+        var data = [
+            {
+                "ФИО": "Белоусов Лев Даниэльевич",
+                "Дата прохождения": "17.10.2023   15:10",
+                "Диагностика": "43 Профессии",
+                "Результаты": "0.27 0.33 0.18 0.47",
+                "Открытый ответ": "Открытый ответ"
+            },
+            {
+                "ФИО": "Иванова Алёна Александровна",
+                "Дата прохождения": "14.09.2023   13:30",
+                "Диагностика": "10 Любимых дел (Взрослый)",
+                "Результаты": "0.65 0.25 0.11 0.89",
+            },
+            {
+                "ФИО": "Зиновьев Александр Тимурович",
+                "Дата прохождения": "26.02.2023   15:01",
+                "Диагностика": "Идеальная работа (Детский)",
+                "Результаты": "0.77 0.52 0.45 0.12",
+            },
+            {
+                "ФИО": "Сидоров Павел Иванович",
+                "Дата прохождения": "19.12.2023   23:11",
+                "Диагностика": "Мои потребности (Детский)",
+                "Результаты": "0.52 0.35 0.45 0.75",
+                "Доп поле": "1 2 3"
+            }
+        ]
+
+        function ExportCSV() {
+            const fileName = "Export From JSON"
+            const exportType = document.querySelector("#type").value   //exported type could be text, json, csv, xls, xml
+            const fields = ["ФИО", "Дата прохождения", "Диагностика", "Результаты", "Открытый ответ", "Доп поле"]
+            
+            window.exportFromJSON({ data, fileName, fields, exportType })
+        }
+
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
+    <script>
+        function XLSXutils() {
+            // Документация https://docs.sheetjs.com/docs/api/utilities/
+
+            let myFile = "XLSX utils.xlsx";
+            let myWorkSheet = XLSX.utils.json_to_sheet(data);
+            // XLSX.utils.sheet_add_aoa(myWorkSheet, [["Your Mesage Goes Here 123"]], { origin: 0 });
+
+            // let merges = myWorkSheet['!merges'] = [{ s: 'A1', e: 'D1' }];
+            let myWorkBook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(myWorkBook, myWorkSheet, "data");
+            XLSX.writeFile(myWorkBook, myFile);
+        }
+    </script>
+
+    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+    <script>
+        function ExportPDF() {
+            const element = document.querySelector('#pdf-export');
+
+            let opt = {
+                margin:  1,
+                filename: 'HTML to PDF.pdf',
+                html2canvas:  { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            }
+
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+
+    <section>
+        <fieldset>
+            <legend>Export From JSON</legend>
+    
+            <div class="control">
+                <p>Тип файла</p>
+                
+                <select id="type">
+                    <option selected value="xls">xls</option>
+                    <option value="csv">csv</option>
+                    <option value="xml">xml</option>
+                    <!-- <option value="text">text</option> -->
+                    <option value="json">json</option>
+                </select>
+                
+                <button onclick="ExportCSV()">Выгрузить</button>
+            </div>
+        </fieldset>
+    
+        <fieldset>
+            <legend>XLSX utils</legend>
+    
+            <button onclick="XLSXutils()">Выгрузить</button>
+        </fieldset>
+
+        <fieldset>
+            <legend>HTML to PDF</legend>
+    
+            <button onclick="ExportPDF()">Выгрузить</button>
+
+            <div id="pdf-export">
+                <div class="card">
+                    <p>ФИО: Белоусов Лев Даниэльевич</p>
+                    <p>Дата прохождения: 17.10.2023   15:10</p>
+                    <p>Диагностика: 43 Профессии</p>
+                    <p>Результаты: 0.27 0.33 0.18 0.47</p>
+                    <p>Открытый ответ: Открытый ответ</p>
+                </div>
+                
+                <div class="card">
+                    <p>ФИО: Иванова Алёна Александровна</p>
+                    <p>Дата прохождения: 14.09.2023   13:30</p>
+                    <p>Диагностика: 10 Любимых дел (Взрослый)</p>
+                    <p>Результаты: 0.65 0.25 0.11 0.89</p>
+                </div>
+
+                <div class="card">
+                    <p>ФИО: Зиновьев Александр Тимурович</p>
+                    <p>Дата прохождения: 26.02.2023   15:01</p>
+                    <p>Диагностика: Идеальная работа (Детский)</p>
+                    <p>Результаты: 0.77 0.52 0.45 0.12</p>
+                </div>
+
+                <div class="card">
+                    <p>ФИО: Сидоров Павел Иванович</p>
+                    <p>Дата прохождения: 19.12.2023   23:11</p>
+                    <p>Диагностика: Мои потребности (Детский)</p>
+                    <p>Результаты: 0.52 0.35 0.45 0.75</p>
+                    <p>Доп поле: 1 2 3</p>
+                </div>
+            </div>
+        </fieldset>
+    </section>
+</body>
+</html>
